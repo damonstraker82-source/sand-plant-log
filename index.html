@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sand Plant Log</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        input { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        td { border: 1px solid #ccc; padding: 10px; }
+        button { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px 5px 0 0; }
+        button:hover { background: #0052a3; }
+        .section-header { background: #0066cc; color: white; padding: 8px; font-weight: bold; margin-top: 15px; }
+        .output { background: #ffffcc; padding: 10px; margin: 10px 0; border: 2px solid #cc9900; border-radius: 4px; }
+        .result { font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sand Plant Shift Log</h1>
+        
+        <div class="section-header">INPUT</div>
+        <label>Buckets Fed:</label>
+        <input type="number" id="buckets" value="60">
+        
+        <div class="output">
+            <strong>Input Tonnage:</strong>
+            <div class="result" id="inputResult">256.8 TN</div>
+        </div>
+
+        <div class="section-header">OUTPUT</div>
+        <label>3/8" Gravel (TN):</label>
+        <input type="number" id="gravel" value="180">
+        
+        <label>Sand (TN):</label>
+        <input type="number" id="sand" value="0">
+        
+        <div class="output">
+            <strong>Total Output:</strong>
+            <div class="result" id="outputResult">180 TN</div>
+        </div>
+
+        <div class="output">
+            <strong>Yield %:</strong>
+            <div class="result" id="yieldResult">70.1%</div>
+        </div>
+
+        <button onclick="calculate()">Calculate</button>
+        <button onclick="clearAll()">Clear</button>
+    </div>
+
+    <script>
+        const TN_PER_BUCKET = 4.28;
+
+        function calculate() {
+            const buckets = parseFloat(document.getElementById('buckets').value) || 0;
+            const gravel = parseFloat(document.getElementById('gravel').value) || 0;
+            const sand = parseFloat(document.getElementById('sand').value) || 0;
+            
+            const inputTN = buckets * TN_PER_BUCKET;
+            const outputTN = gravel + sand;
+            const yield_pct = inputTN > 0 ? ((outputTN / inputTN) * 100).toFixed(1) : 0;
+            
+            document.getElementById('inputResult').textContent = inputTN.toFixed(2) + ' TN';
+            document.getElementById('outputResult').textContent = outputTN.toFixed(2) + ' TN';
+            document.getElementById('yieldResult').textContent = yield_pct + '%';
+            
+            // Color code yield
+            const yieldDiv = document.getElementById('yieldResult').parentElement;
+            if (yield_pct < 65) yieldDiv.style.background = '#ffcccc';
+            else if (yield_pct < 70)
