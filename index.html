@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sand Plant Shift Log</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 12px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 8px;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 8px;
+        }
+        .header-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .header-item label { 
+            font-weight: bold; 
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        .header-item input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-header {
+            background: #0066cc;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        th {
+            background: #e8e8e8;
+            border: 1px solid #999;
+            padding: 6px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        td input, td textarea {
+            border: none;
+            width: 100%;
+            padding: 4px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        td input[readonly] { background: #f9f9f9; }
+        .label-cell {
+            background: #f9f9f9;
+            font-weight: 600;
+            width: 40%;
+        }
+        .calc-box {
+            background: #fffacd;
+            border: 2px solid #cc9900;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        .calc-box input {
+            border: 1px solid #cc9900;
+            padding: 4px;
+            margin: 0 4px;
+            font-weight: bold;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            max-width: 200px;
+        }
+        button:hover { background: #0052a3; }
+        button.secondary { background: #6c757d; }
+        button.secondary:hover { background: #5a6268; }
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            display: none;
+            font-size: 12px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .header-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SAND WASH PLANT — DAILY SHIFT LOG</h1>
+        
+        <form id="shiftForm">
+            <div class="header-row">
+                <div class="header-item">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="header-item">
+                    <label>Operator Name</label>
+                    <input type="text" id="operatorName" placeholder="Name" required>
+                </div>
+                <div class="header-item">
+                    <label>Shift</label>
+                    <input type="text" id="shift" placeholder="8am-4pm">
+                </div>
+            </div>
+
+            <div class="header-row">
+                <div class="header-item">
+                    <label>Start Time</label>
+                    <input type="time" id="startTime">
+                </div>
+                <div class="header-item">
+                    <label>End Time</label>
+                    <input type="time" id="endTime">
+                </div>
+            </div>
+
+            <!-- INPUT -->
+            <div class="section">
+                <div class="section-header">INPUT MATERIAL</div>
+                <table>
+                    <tr>
+                        <td class="label-cell"><strong>Buckets Fed</strong></td>
+                        <td><input type="number" id="bucketCount" placeholder="0" min="0" value="60"></td>
+                        <td class="label-cell"><strong>Input Tonnage (TN)</strong></td>
+                        <td><input type="number" id="inputTonnage" readonly></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- WATER -->
+            <div class="section">
+                <div class="section-header">WATER TANK LEVEL — Read 3× Per Shift</div>
+                <table>
+                    <tr>
+                        <th>Time (Start)</th>
+                        <th>Level</th>
+                        <th>Time (Mid)</th>
+                        <th>Level</th>
+                    </tr>
+                    <tr>
+                        <td><input type="time" id="waterTimeStart"></td>
+                        <td><input type="number" id="waterStart" placeholder="0"></td>
+                        <td><input type="time" id="waterTimeMid"></td>
+                        <td><input type="number" id="waterMid" placeholder="0"></td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>Time (End)</th>
+                        <th>Level</th>
+                        <th>Water Added</th>
+                        <th>Total Used</th>
+                    </tr>
+                    <tr>
+                        <td><input type="time" id="waterTimeEnd"></td>
+                        <td><input type="number" id="waterEnd" placeholder="0"></td>
+                        <td><input type="number" id="waterAdded" placeholder="0"></td>
+                        <td><input type="number" id="waterTotal" readonly></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- HYDRAULIC -->
+            <div class="section">
+                <div class="section-header">HYDRAULIC SYSTEM PRESSURE — Read 3× Per Shift</div>
+                <table>
+                    <tr>
+                        <th>Time (Start)</th>
+                        <th>Pressure (PSI)</th>
+                        <th>Time (Mid)</th>
+                        <th>Pressure</th>
+                        <th>Stable?</th>
+                    </tr>
+                    <tr>
+                        <td><input type="time" id="hydTimeStart"></td>
+                        <td><input type="text" id="hydraulicStart" placeholder="0 PSI"></td>
+                        <td><input type="time" id="hydTimeMid"></td>
+                        <td><input type="text" id="hydraulicMid" placeholder="0 PSI"></td>
+                        <td><input type="text" id="pressureStable" placeholder="Y/N"></td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>Time (End)</th>
+                        <th>Pressure</th>
+                        <th colspan="2">Notes</th>
+                    </tr>
+                    <tr>
+                        <td><input type="time" id="hydTimeEnd"></td>
+                        <td><input type="text" id="hydraulicEnd" placeholder="0 PSI"></td>
+                        <td colspan="2"><input type="text" id="hydraulicNotes" placeholder="Observations"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- OUTPUT -->
+            <div class="section">
+                <div class="section-header">PRODUCT OUTPUT — Actual Weight</div>
+                <table>
+                    <tr>
+                        <td class="label-cell"><strong>3/8″ Gravel (TN)</strong></td>
+                        <td><input type="number" id="gravelOutput" placeholder="0" min="0" value="180"></td>
+                        <td class="label-cell"><strong>Sand (TN)</strong></td>
+                        <td><input type="number" id="sandOutput" placeholder="0" min="0"></td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell"><strong>Total Output (TN)</strong></td>
+                        <td colspan="3"><input type="number" id="totalOutput" readonly></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- QUALITY -->
+            <div class="section">
+                <div class="section-header">PRODUCT QUALITY</div>
+                <table>
+                    <tr>
+                        <td class="label-cell"><strong>Gravel Moisture %</strong></td>
+                        <td><input type="number" id="gravelMoisture" placeholder="0" step="0.1"></td>
+                        <td class="label-cell"><strong>Sand Moisture %</strong></td>
+                        <td><input type="number" id="sandMoisture" placeholder="0" step="0.1"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- FILTER PRESS -->
+            <div class="section">
+                <div class="section-header">FILTER PRESS</div>
+                <table>
+                    <tr>
+                        <td class="label-cell"><strong>Cycles Run</strong></td>
+                        <td><input type="number" id="filterPressCycles" placeholder="0"></td>
+                        <td class="label-cell"><strong>Cake Dryness</strong></td>
+                        <td><input type="text" id="filterCakeDryness" placeholder="Wet/Damp/Dry"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- YIELD -->
+            <div class="section">
+                <div class="calc-box">
+                    <strong>DAILY YIELD %</strong><br>
+                    Input: <input type="number" id="yieldInput" readonly style="width: 70px;"> ÷ 
+                    Output: <input type="number" id="yieldOutput" readonly style="width: 70px;"> = 
+                    <strong><input type="number" id="yieldPercent" readonly style="width: 100px;"> %</strong>
+                </div>
+            </div>
+
+            <!-- ISSUES -->
+            <div class="section">
+                <div class="section-header">ISSUES & NOTES</div>
+                <textarea id="issues" placeholder="Report any problems or observations..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="secondary" onclick="clearForm()">Clear</button>
+                <button type="submit">Save to Google Drive</button>
+            </div>
+
+            <div id="status" class="status"></div>
+        </form>
+    </div>
+
+    <script>
+        const BACKEND_URL = "YOUR_BACKEND_URL_HERE"; // Replace with Apps Script URL
+        const TN_PER_BUCKET = 4.28;
+
+        document.getElementById('date').valueAsDate = new Date();
+
+        function calculateInputTonnage() {
+            const buckets = parseFloat(document.getElementById('bucketCount').value) || 0;
+            const tonnage = (buckets * TN_PER_BUCKET).toFixed(2);
+            document.getElementById('inputTonnage').value = tonnage;
+            document.getElementById('yieldInput').value = tonnage;
+            calculateYield();
+        }
+
+        function calculateTotalOutput() {
+            const gravel = parseFloat(document.getElementById('gravelOutput').value) || 0;
+            const sand = parseFloat(document.getElementById('sandOutput').value) || 0;
+            const total = (gravel + sand).toFixed(2);
+            document.getElementById('totalOutput').value = total;
+            document.getElementById('yieldOutput').value = total;
+            calculateYield();
+        }
+
+        function calculateYield() {
+            const input = parseFloat(document.getElementById('yieldInput').value) || 0;
+            const output = parseFloat(document.getElementById('yieldOutput').value) || 0;
+            
+            if (input > 0) {
+                const yield_pct = ((output / input) * 100).toFixed(1);
+                const yieldField = document.getElementById('yieldPercent');
+                yieldField.value = yield_pct;
+                
+                if (yield_pct < 65) yieldField.style.backgroundColor = '#ffcccc';
+                else if (yield_pct < 70) yieldField.style.backgroundColor = '#ffffcc';
+                else if (yield_pct <= 80) yieldField.style.backgroundColor = '#ccffcc';
+                else yieldField.style.backgroundColor = '#ccffff';
+            }
+        }
+
+        document.getElementById('bucketCount').addEventListener('input', calculateInputTonnage);
+        document.getElementById('gravelOutput').addEventListener('input', calculateTotalOutput);
+        document.getElementById('sandOutput').addEventListener('input', calculateTotalOutput);
+
+        document.getElementById('shiftForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('date').value,
+                operatorName: document.getElementById('operatorName').value,
+                shift: document.getElementById('shift').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                bucketCount: document.getElementById('bucketCount').value,
+                inputTonnage: document.getElementById('inputTonnage').value,
+                waterStart: document.getElementById('waterStart').value,
+                waterMid: document.getElementById('waterMid').value,
+                waterEnd: document.getElementById('waterEnd').value,
+                waterTotal: document.getElementById('waterTotal').value,
+                hydraulicStart: document.getElementById('hydraulicStart').value,
+                hydraulicMid: document.getElementById('hydraulicMid').value,
+                hydraulicEnd: document.getElementById('hydraulicEnd').value,
+                pressureStable: document.getElementById('pressureStable').value,
+                gravelOutput: document.getElementById('gravelOutput').value,
+                sandOutput: document.getElementById('sandOutput').value,
+                totalOutput: document.getElementById('totalOutput').value,
+                gravelMoisture: document.getElementById('gravelMoisture').value,
+                sandMoisture: document.getElementById('sandMoisture').value,
+                filterPressCycles: document.getElementById('filterPressCycles').value,
+                filterCakeDryness: document.getElementById('filterCakeDryness').value,
+                yieldInput: document.getElementById('yieldInput').value,
+                yieldOutput: document.getElementById('yieldOutput').value,
+                yieldPercent: document.getElementById('yieldPercent').value,
+                issues: document.getElementById('issues').value
+            };
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('✓ Data saved to Google Drive', 'success');
+                    setTimeout(clearForm, 2000);
+                } else {
+                    showStatus('Error: ' + result.message, 'error');
+                }
+            } catch(err) {
+                showStatus('Error saving data: ' + err, 'error');
+            }
+        });
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+            setTimeout(() => statusEl.className = 'status', 3000);
+        }
+
+        function clearForm() {
+            if (confirm('Clear all fields?')) {
+                document.getElementById('shiftForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                calculateInputTonnage();
+            }
+        }
+
+        calculateInputTonnage();
+    </script>
+</body>
+</html>
