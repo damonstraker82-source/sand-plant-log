@@ -183,7 +183,7 @@
                 <table>
                     <tr>
                         <td class="label-cell"><strong>Buckets Fed</strong></td>
-                        <td><input type="number" id="bucketCount" placeholder="0" min="0" value="60"></td>
+                        <td><input type="number" id="bucketCount" placeholder="0" min="0" value="60" onchange="calculateInputTonnage()" oninput="calculateInputTonnage()"></td>
                         <td class="label-cell"><strong>Input Tonnage (TN)</strong></td>
                         <td><input type="number" id="inputTonnage" readonly></td>
                     </tr>
