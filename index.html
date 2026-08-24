@@ -325,130 +325,164 @@
     </div>
 
     <script>
-    const BACKEND_URL = "https://script.google.com/a/macros/jadagroup.com/s/AKfycbwdh8FXcOi8DwR9vfV1GX2AODgvyT2o2F59pLqgge0t720nl_8mc2Ft9XsXqklEy52Zsw/exec";
-    const TN_PER_BUCKET = 4.28;
+        const BACKEND_URL = "https://script.google.com/a/macros/jadagroup.com/s/AKfycbwdh8FXcOi8DwR9vfV1GX2AODgvyT2o2F59pLqgge0t720nl_8mc2Ft9XsXqklEy52Zsw/exec";
+        const TN_PER_BUCKET = 4.28;
 
-    // Initialize on load
-    window.addEventListener('load', function() {
-        console.log('Page loaded, initializing...');
-        document.getElementById('date').valueAsDate = new Date();
-        calculateInputTonnage();
-        calculateTotalOutput();
-        setupEventListeners();
-    });
-
-    function setupEventListeners() {
-        const bucketInput = document.getElementById('bucketCount');
-        const gravelInput = document.getElementById('gravelOutput');
-        const sandInput = document.getElementById('sandOutput');
-        
-        if (bucketInput) bucketInput.addEventListener('input', calculateInputTonnage);
-        if (gravelInput) gravelInput.addEventListener('input', calculateTotalOutput);
-        if (sandInput) sandInput.addEventListener('input', calculateTotalOutput);
-        
-        console.log('Event listeners attached');
-    }
-
-    function calculateInputTonnage() {
-        const buckets = parseFloat(document.getElementById('bucketCount').value) || 0;
-        const tonnage = (buckets * TN_PER_BUCKET).toFixed(2);
-        console.log('Buckets: ' + buckets + ', Tonnage: ' + tonnage);
-        
-        document.getElementById('inputTonnage').value = tonnage;
-        document.getElementById('yieldInput').value = tonnage;
-        calculateYield();
-    }
-
-    function calculateTotalOutput() {
-        const gravel = parseFloat(document.getElementById('gravelOutput').value) || 0;
-        const sand = parseFloat(document.getElementById('sandOutput').value) || 0;
-        const total = (gravel + sand).toFixed(2);
-        
-        document.getElementById('totalOutput').value = total;
-        document.getElementById('yieldOutput').value = total;
-        calculateYield();
-    }
-
-    function calculateYield() {
-        const input = parseFloat(document.getElementById('yieldInput').value) || 0;
-        const output = parseFloat(document.getElementById('yieldOutput').value) || 0;
-        
-        if (input > 0) {
-            const yield_pct = ((output / input) * 100).toFixed(1);
-            const yieldField = document.getElementById('yieldPercent');
-            yieldField.value = yield_pct;
+        function calculateInputTonnage() {
+            const bucketCount = document.getElementById('bucketCount');
+            const inputTonnage = document.getElementById('inputTonnage');
+            const yieldInput = document.getElementById('yieldInput');
             
-            if (yield_pct < 65) yieldField.style.backgroundColor = '#ffcccc';
-            else if (yield_pct < 70) yieldField.style.backgroundColor = '#ffffcc';
-            else if (yield_pct <= 80) yieldField.style.backgroundColor = '#ccffcc';
-            else yieldField.style.backgroundColor = '#ccffff';
+            if (!bucketCount || !inputTonnage) return;
+            
+            const buckets = parseFloat(bucketCount.value) || 0;
+            const tonnage = (buckets * TN_PER_BUCKET).toFixed(2);
+            inputTonnage.value = tonnage;
+            yieldInput.value = tonnage;
+            calculateYield();
         }
-    }
 
-    document.getElementById('shiftForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            date: document.getElementById('date').value,
-            operatorName: document.getElementById('operatorName').value,
-            shift: document.getElementById('shift').value,
-            startTime: document.getElementById('startTime').value,
-            endTime: document.getElementById('endTime').value,
-            bucketCount: document.getElementById('bucketCount').value,
-            inputTonnage: document.getElementById('inputTonnage').value,
-            waterStart: document.getElementById('waterStart').value,
-            waterMid: document.getElementById('waterMid').value,
-            waterEnd: document.getElementById('waterEnd').value,
-            waterTotal: document.getElementById('waterTotal').value,
-            hydraulicStart: document.getElementById('hydraulicStart').value,
-            hydraulicMid: document.getElementById('hydraulicMid').value,
-            hydraulicEnd: document.getElementById('hydraulicEnd').value,
-            pressureStable: document.getElementById('pressureStable').value,
-            gravelOutput: document.getElementById('gravelOutput').value,
-            sandOutput: document.getElementById('sandOutput').value,
-            totalOutput: document.getElementById('totalOutput').value,
-            gravelMoisture: document.getElementById('gravelMoisture').value,
-            sandMoisture: document.getElementById('sandMoisture').value,
-            filterPressCycles: document.getElementById('filterPressCycles').value,
-            filterCakeDryness: document.getElementById('filterCakeDryness').value,
-            yieldInput: document.getElementById('yieldInput').value,
-            yieldOutput: document.getElementById('yieldOutput').value,
-            yieldPercent: document.getElementById('yieldPercent').value,
-            issues: document.getElementById('issues').value
-        };
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData)
-            });
-            const result = await response.json();
+        function calculateTotalOutput() {
+            const gravelOutput = document.getElementById('gravelOutput');
+            const sandOutput = document.getElementById('sandOutput');
+            const totalOutput = document.getElementById('totalOutput');
+            const yieldOutput = document.getElementById('yieldOutput');
             
-            if (result.success) {
-                showStatus('✓ Data saved to Google Drive', 'success');
-                setTimeout(clearForm, 2000);
+            if (!gravelOutput || !sandOutput || !totalOutput) return;
+            
+            const gravel = parseFloat(gravelOutput.value) || 0;
+            const sand = parseFloat(sandOutput.value) || 0;
+            const total = (gravel + sand).toFixed(2);
+            totalOutput.value = total;
+            yieldOutput.value = total;
+            calculateYield();
+        }
+
+        function calculateYield() {
+            const yieldInput = document.getElementById('yieldInput');
+            const yieldOutput = document.getElementById('yieldOutput');
+            const yieldPercent = document.getElementById('yieldPercent');
+            
+            if (!yieldPercent) return;
+            
+            const input = parseFloat(yieldInput.value) || 0;
+            const output = parseFloat(yieldOutput.value) || 0;
+            
+            if (input > 0) {
+                const yield_pct = ((output / input) * 100).toFixed(1);
+                yieldPercent.value = yield_pct;
+                
+                if (yield_pct < 65) yieldPercent.style.backgroundColor = '#ffcccc';
+                else if (yield_pct < 70) yieldPercent.style.backgroundColor = '#ffffcc';
+                else if (yield_pct <= 80) yieldPercent.style.backgroundColor = '#ccffcc';
+                else yieldPercent.style.backgroundColor = '#ccffff';
             } else {
-                showStatus('Error: ' + result.message, 'error');
+                yieldPercent.value = '';
+                yieldPercent.style.backgroundColor = 'white';
             }
-        } catch(err) {
-            showStatus('Error saving data: ' + err, 'error');
         }
-    });
 
-    function showStatus(message, type) {
-        const statusEl = document.getElementById('status');
-        statusEl.textContent = message;
-        statusEl.className = 'status ' + type;
-        setTimeout(() => statusEl.className = 'status', 3000);
-    }
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+            setTimeout(() => statusEl.className = 'status', 3000);
+        }
 
-    function clearForm() {
-        if (confirm('Clear all fields?')) {
-            document.getElementById('shiftForm').reset();
-            document.getElementById('date').valueAsDate = new Date();
+        function clearForm() {
+            if (confirm('Clear all fields?')) {
+                document.getElementById('shiftForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                calculateInputTonnage();
+            }
+        }
+
+        // Set up everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date
+            const dateField = document.getElementById('date');
+            if (dateField) {
+                dateField.valueAsDate = new Date();
+            }
+            
+            // Attach event listeners
+            const bucketCount = document.getElementById('bucketCount');
+            const gravelOutput = document.getElementById('gravelOutput');
+            const sandOutput = document.getElementById('sandOutput');
+            
+            if (bucketCount) {
+                bucketCount.addEventListener('change', calculateInputTonnage);
+                bucketCount.addEventListener('input', calculateInputTonnage);
+            }
+            
+            if (gravelOutput) {
+                gravelOutput.addEventListener('change', calculateTotalOutput);
+                gravelOutput.addEventListener('input', calculateTotalOutput);
+            }
+            
+            if (sandOutput) {
+                sandOutput.addEventListener('change', calculateTotalOutput);
+                sandOutput.addEventListener('input', calculateTotalOutput);
+            }
+            
+            // Attach form submission
+            const shiftForm = document.getElementById('shiftForm');
+            if (shiftForm) {
+                shiftForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        date: document.getElementById('date').value,
+                        operatorName: document.getElementById('operatorName').value,
+                        shift: document.getElementById('shift').value,
+                        startTime: document.getElementById('startTime').value,
+                        endTime: document.getElementById('endTime').value,
+                        bucketCount: document.getElementById('bucketCount').value,
+                        inputTonnage: document.getElementById('inputTonnage').value,
+                        waterStart: document.getElementById('waterStart').value,
+                        waterMid: document.getElementById('waterMid').value,
+                        waterEnd: document.getElementById('waterEnd').value,
+                        waterTotal: document.getElementById('waterTotal').value,
+                        hydraulicStart: document.getElementById('hydraulicStart').value,
+                        hydraulicMid: document.getElementById('hydraulicMid').value,
+                        hydraulicEnd: document.getElementById('hydraulicEnd').value,
+                        pressureStable: document.getElementById('pressureStable').value,
+                        gravelOutput: document.getElementById('gravelOutput').value,
+                        sandOutput: document.getElementById('sandOutput').value,
+                        totalOutput: document.getElementById('totalOutput').value,
+                        gravelMoisture: document.getElementById('gravelMoisture').value,
+                        sandMoisture: document.getElementById('sandMoisture').value,
+                        filterPressCycles: document.getElementById('filterPressCycles').value,
+                        filterCakeDryness: document.getElementById('filterCakeDryness').value,
+                        yieldInput: document.getElementById('yieldInput').value,
+                        yieldOutput: document.getElementById('yieldOutput').value,
+                        yieldPercent: document.getElementById('yieldPercent').value,
+                        issues: document.getElementById('issues').value
+                    };
+
+                    try {
+                        const response = await fetch(BACKEND_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(formData)
+                        });
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            showStatus('✓ Data saved to Google Drive', 'success');
+                            setTimeout(clearForm, 2000);
+                        } else {
+                            showStatus('Error: ' + result.message, 'error');
+                        }
+                    } catch(err) {
+                        showStatus('Error saving data: ' + err, 'error');
+                    }
+                });
+            }
+            
+            // Initial calculation
             calculateInputTonnage();
-        }
-    }
-</script>
+            calculateTotalOutput();
+        });
+    </script>
 </body>
 </html>
