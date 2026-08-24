@@ -262,9 +262,9 @@
                 <table>
                     <tr>
                         <td class="label-cell"><strong>3/8″ Gravel (TN)</strong></td>
-                        <td><input type="number" id="gravelOutput" placeholder="0" min="0" value="180"></td>
+                        <td><input type="number" id="gravelOutput" placeholder="0" min="0" value="180" onchange="calculateTotalOutput()" oninput="calculateTotalOutput()"></td>
                         <td class="label-cell"><strong>Sand (TN)</strong></td>
-                        <td><input type="number" id="sandOutput" placeholder="0" min="0"></td>
+                        <td><input type="number" id="sandOutput" placeholder="0" min="0" onchange="calculateTotalOutput()" oninput="calculateTotalOutput()"></td>
                     </tr>
                     <tr>
                         <td class="label-cell"><strong>Total Output (TN)</strong></td>
